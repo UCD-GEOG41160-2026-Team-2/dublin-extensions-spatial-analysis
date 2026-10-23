@@ -1,2 +1,43 @@
-# dublin-extensions-spatial-analysis
-Dublin City planning-extension density, global spatial autocorrelation, LISA clusters and Getis-Ord Gi* hotspots using Python and GIS
+# Dublin Extensions: Spatial Analysis
+
+## Project Overview
+
+This project analyses planning applications for building extensions in Dublin City by Electoral Division (ED). It calculates extension-application density, investigates global spatial autocorrelation, identifies local spatial clusters using Local Moran's I (LISA), and maps hotspots and coldspots using Getis-Ord Gi*.
+
+## Repository Structure
+
+- `data/planning/` — National planning-application GeoPackage.
+- `data/boundaries/` — National Electoral Division boundary GeoPackage.
+- `scripts/` — Python scripts for Questions 1, 2 and 3.
+- `outputs/` — Generated database, spatial datasets, figures and maps.
+
+## Data Sources and Licences
+
+1. **Planning Application Points:** Department of Housing, Local Government and Heritage. Source: https://data-housinggovie.opendata.arcgis.com/datasets/housinggovie::planning-application-points  
+   Licence: CC BY 4.0. Download date: [INSERT ACTUAL DOWNLOAD DATE].
+
+2. **Electoral Divisions:** Tailte Éireann, CSO Electoral Divisions — National Statistical Boundaries — 2022 — Ungeneralised. Source: https://data-osi.opendata.arcgis.com/datasets/osi::cso-electoral-divisions-national-statistical-boundaries-2022-ungeneralised  
+   Licence: CC BY 4.0.
+
+## Coordinate Reference System
+
+The analysis uses Irish Transverse Mercator (EPSG:2157) for spatial calculations, including area and density calculations. Planning applications will be reprojected to the boundary layer's coordinate reference system before spatial analysis.
+
+## Execution Order
+
+Run the scripts from the repository root in this order:
+
+1. `python scripts/Q1_ExtensionDensity.py`
+2. `python scripts/Q2_GlobalMoran.py`
+3. `python scripts/Q3_LISA_GiStar.py`
+
+The input GeoPackages must be saved in their specified locations before running the scripts. The outputs from Question 1 are used in the subsequent spatial-statistics analyses.
+
+## Sprint Log
+
+| Sprint | Date | Work completed | Next steps |
+|---|---|---|---|
+| Sprint 0 | [DATE] | Repository setup and initial README | Prepare and verify the input data |
+| Sprint 1 | [DATE] | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
+| Sprint 2 | [DATE] | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
+| Sprint 3 | [DATE] | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
