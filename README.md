@@ -33,6 +33,15 @@ Run the scripts from the repository root in this order:
 
 The input GeoPackages must be saved in their specified locations before running the scripts. The outputs from Question 1 are used in the subsequent spatial-statistics analyses.
 
+
+## Generated Outputs
+- outputs/extensions.duckdb — DuckDB database created in Question 1.
+- outputs/DublinED_ExtensionDensity.gpkg — Extension density by Electoral Division.
+- outputs/ExtensionDensity_DublinED.png — Extension density map.
+- outputs/LISA_ExtensionDensity_DublinED.png — Local Moran’s I cluster map.
+- outputs/GiStar_ExtensionDensity_DublinED.png — Getis-Ord Gi* hotspot and coldspot map.
+
+
 ## Sprint Log
 
 | Sprint | Date | Work completed | Next steps |
