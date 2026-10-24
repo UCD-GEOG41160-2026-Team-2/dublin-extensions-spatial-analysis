@@ -13,3 +13,7 @@ Thumbs.db
 
 # Temporary database files
 *.duckdb.wal
+
+# Excluding large sized files to make push smoothly 
+*.gpkg
+*.duckdb
