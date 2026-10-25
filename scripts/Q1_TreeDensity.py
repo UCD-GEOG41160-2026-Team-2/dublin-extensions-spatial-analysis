@@ -7,8 +7,12 @@ ANSWERS
     - Dublin City EDs count: 162 features (imported from national boundaries, filtered for COUNTY_ENGLISH = 'Dublin City').
     - Filtered planning applications count: 9,914 rows (filtered for Dublin City Council, years 2019-2025, and development description containing 'extension').
 
-
+2. Inspecting both layers' CRS, geometry type and feature counts and reprojecting extension apps.
+    -Used GeoPandas to verify CRS projection, will explain in details why did not do it with SQL query on individual report.
+    -Printing geometry types and feature count via DuckDB
+    -Reprojecting extension applications from EPSG:3857 to match EDs' EPSG:2157
 """
+
 from pathlib import Path
 
 import numpy as np
@@ -66,4 +70,43 @@ con.execute(f"""
 ext_count = con.execute("SELECT COUNT (*) FROM extensions;").fetchone()[0]
 print(f"Filtered extensions rows: {ext_count}")
 
+#########################################
+##### 2. CRS AND REPROJECTION #####
+#########################################
 
+## a. Reading a small portion to verify CRS
+eds_gdf = gpd.read_file(EDS, rows=5)
+print("ED Boundaries CRS:", eds_gdf.crs)
+
+ext_gdf = gpd.read_file(PLANNING, rows=5)
+print("Extension Planning applications CRS:", ext_gdf.crs)
+
+## b. Inspecting geometry types and feature counts via DuckDB
+eds_info = con.execute("""
+    SELECT 
+                ST_GeometryType(SHAPE) AS geom_type,
+                COUNT (*) AS total_features
+    FROM eds
+    GROUP BY geom_type
+""").fetchone()
+
+print("EDs Info (Geometry Type, Count):", eds_info)
+
+ext_info = con.execute("""
+    SELECT 
+                ST_GeometryType(SHAPE) AS geom_type,
+                COUNT (*) AS total_features
+    FROM extensions
+    GROUP BY geom_type
+""").fetchone()
+
+print("Extension applications' info (Geometry Type, Count):", ext_info)
+
+## c. Reprojecting extension applications
+con.execute("""
+    CREATE or REPLACE TABLE extensions_projected AS
+    SELECT * EXCLUDE (SHAPE),
+            ST_Transform(SHAPE, 'EPSG:3857', 'EPSG:2157', always_xy := true) AS SHAPE_2157
+            FROM extensions 
+""")
+print("Successfully reprojected extensions layer to EPSG:2157!")
