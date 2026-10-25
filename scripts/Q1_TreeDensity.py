@@ -11,6 +11,20 @@ ANSWERS
     -Used GeoPandas to verify CRS projection, will explain in details why did not do it with SQL query on individual report.
     -Printing geometry types and feature count via DuckDB
     -Reprojecting extension applications from EPSG:3857 to match EDs' EPSG:2157
+        # Why reproject to Irish Transverse Mercator (EPSG:2157)?
+        # The raw data showed up in Web Mercator (EPSG:3857) — which is great
+        # for web maps like Google Maps, but messes up local measurements.
+        # Web Mercator distorts areas and distances in Ireland, so we need
+        # EPSG:2157 (the official local system) to keep our distances, areas,
+        # and spatial joins for Dublin totally accurate.
+
+3. Spatial join and Boundary Check:
+    -Successfully performed a spatial join between EDs and reprojected extension points, printing out the aggregated table.
+    -Top EDs by application volume: Clontarf East B (304 applications), followed by Rathmines East C (199), and Pembroke West A (188) in 3rd place.
+    -Applications falling outside the Dublin's ED boundaries: 14. These points fell outside because:
+        a. Some fall just across the border into neighboring council areas (like Fingal or South Dublin).
+        b. Some are near water or coastlines where the land shape boundary stops.
+        c. Some address coordinates could be slightly off and landed just outside the official map border.
 """
 
 from pathlib import Path
@@ -106,7 +120,39 @@ print("Extension applications' info (Geometry Type, Count):", ext_info)
 con.execute("""
     CREATE or REPLACE TABLE extensions_projected AS
     SELECT * EXCLUDE (SHAPE),
-            ST_Transform(SHAPE, 'EPSG:3857', 'EPSG:2157', always_xy := true) AS SHAPE_2157
+            ST_Transform(SHAPE, 'EPSG:3857', 'EPSG:2157', always_xy := true) AS SHAPE
             FROM extensions 
 """)
 print("Successfully reprojected extensions layer to EPSG:2157!")
+
+
+#########################################
+##### 3. SPATIAL JOIN AND AGGREGATION #####
+#########################################
+
+## a. Joining eds in dublin with reprojected extension applications by their spatial attributes
+con.sql(""" 
+    CREATE OR REPLACE TABLE eds_applications AS
+    SELECT eds.ED_ENGLISH, eds.SHAPE,
+        COUNT(ex_p.ApplicationNumber) AS extension_applications
+    FROM eds AS eds
+    LEFT JOIN extensions_projected AS ex_p ON ST_Within(ex_p.SHAPE, eds.SHAPE)
+    GROUP BY eds.ED_ENGLISH, eds.SHAPE
+""")
+print(
+    con.sql(
+        "SELECT ED_ENGLISH, extension_applications FROM eds_applications ORDER BY extension_applications DESC LIMIT 5"
+    )
+)
+
+## b. Finding out how many applications fall outside of dublin with WHERE NOT EXISTS query filter
+
+outside_count = con.execute("""
+    SELECT COUNT (*) AS outside_eds
+    FROM extensions_projected as ex_p
+    WHERE NOT EXISTS (       -- Spatial anti-join filter that only keeps the planning application if the subquery inside the parentheses returns no match (0)
+            SELECT 1 FROM EDS    -- Standart SQL optimization, returns dummy value 1 when it finds a geometric match instead of column name
+            WHERE ST_Within(ex_p.SHAPE, eds.SHAPE)            )    
+""").fetchone()[0]
+
+print("Applications outside Dublin City ED boundaries:", outside_count)
