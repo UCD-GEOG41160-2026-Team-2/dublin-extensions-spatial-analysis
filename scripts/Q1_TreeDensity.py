@@ -185,3 +185,10 @@ ex_density_gdf = gpd.GeoDataFrame(density_df, geometry=gpd.GeoSeries.from_wkb(de
 ex_density_gdf.to_file(OUTPUTS / "DublinED_ExtensionDensity.gpkg", driver="GPKG")
 print("Successfully calculated density and saved DublinED_ExtensionDensity.gpkg")
 
+# brief check if density column is added
+print(ex_density_gdf[['ED_ENGLISH', 'extension_applications', 'app_density_km2']].head())
+
+#########################################
+##### 5. PLOTTING THE EXTENSION DENSITY MAP  #####
+#########################################
+
