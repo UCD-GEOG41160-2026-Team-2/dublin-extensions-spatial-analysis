@@ -19,13 +19,19 @@ ANSWERS
         # and spatial joins for Dublin totally accurate.
 
 3. Spatial join and Boundary Check:
-    -Successfully performed a spatial join between EDs and reprojected extension points, printing out the aggregated table.
+    -Performed a spatial join between EDs and reprojected extension points, printing out the aggregated table.
     -Top EDs by application volume: Clontarf East B (304 applications), followed by Rathmines East C (199), and Pembroke West A (188) in 3rd place.
     -Applications falling outside the Dublin's ED boundaries: 14. These points fell outside because:
         a. Some fall just across the border into neighboring council areas (like Fingal or South Dublin).
         b. Some are near water or coastlines where the land shape boundary stops.
         c. Some address coordinates could be slightly off and landed just outside the official map border.
-"""
+
+4. Density calculation and Export:
+    -Calculated local extension densities by dividing total applications by each ED's surface area (converted to sq.kms), and created table in DuckDB
+    -Pulled that table, converted into dataframe, and converted that df into GeoDataFrame and parsing its WKB geometry object to shapely 
+    -Exported resulting gdf to a GeoPackage named 'DublinED_ExtensionDensity.gpkg' in outputs folder.
+    
+    """
 
 from pathlib import Path
 
@@ -156,3 +162,26 @@ outside_count = con.execute("""
 """).fetchone()[0]
 
 print("Applications outside Dublin City ED boundaries:", outside_count)
+
+#########################################
+##### 4. DENSITY CALCULATION AND EXPORT #####
+#########################################
+
+## a. Calculating density using ST_Area method to get square metres, then convert to km2
+con.execute("""
+    CREATE OR REPLACE TABLE eds_density AS
+    SELECT *,
+            extension_applications / (ST_Area(SHAPE) / 1000000.0) AS app_density_km2,
+            ST_AsWKB(SHAPE) AS geometry    -- casting geometry to WKB so that it comes across cleanly as binary that's ready to be passed straight to GeoPandas
+    FROM eds_applications
+""")
+
+## b. Pulling the table from DuckDB into a GeoPandas gdf
+density_df = con.execute("SELECT * FROM eds_density").df()
+ex_density_gdf = gpd.GeoDataFrame(density_df, geometry=gpd.GeoSeries.from_wkb(density_df['geometry'].apply(bytes)), crs="EPSG:2157")
+# converted WKB bytearray geometry to Shapely geometries so GeoPandas can perform spatial functions
+
+## c. Saving it as gpkg as required
+ex_density_gdf.to_file(OUTPUTS / "DublinED_ExtensionDensity.gpkg", driver="GPKG")
+print("Successfully calculated density and saved DublinED_ExtensionDensity.gpkg")
+
