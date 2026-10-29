@@ -30,7 +30,14 @@ ANSWERS
     -Calculated local extension densities by dividing total applications by each ED's surface area (converted to sq.kms), and created table in DuckDB
     -Pulled that table, converted into dataframe, and converted that df into GeoDataFrame and parsing its WKB geometry object to shapely 
     -Exported resulting gdf to a GeoPackage named 'DublinED_ExtensionDensity.gpkg' in outputs folder.
-    
+        -for smaller EDs covering less than 1 sq.km, the density value appears higher than the raw application count because 
+        dividing the count by a fractional area mathematically scales the number upward.
+
+
+5. Mapping the extension density
+    -The map shows clear pattern differences across Dublin : Home extension applications are much higher in certain areas than others.
+    - The highest extension densities (dark blue) are packed into mature residential neighborhoods like Rathmines, Clontarf and parts of South East Dublin where homeowners apparently are actively extending their properties.
+    -The lowest density zones (light blue and white) show up in the commercial city center and outer areas with less housing or more open/industrial land.
     """
 
 from pathlib import Path
@@ -192,3 +199,23 @@ print(ex_density_gdf[['ED_ENGLISH', 'extension_applications', 'app_density_km2']
 ##### 5. PLOTTING THE EXTENSION DENSITY MAP  #####
 #########################################
 
+## a. Loading the saved GeoPackage back in
+ex_density_map = gpd.read_file(OUTPUTS / "DublinED_ExtensionDensity.gpkg")
+
+## b. Plotting the choropleth map using the app_density_km2 
+ax = ex_density_map.plot(
+    column="app_density_km2", 
+    scheme="Quantiles", 
+    k=5, 
+    cmap="Blues", 
+    edgecolor="grey", 
+    linewidth=0.3, 
+    figsize=(7,6), 
+    legend=True, 
+    legend_kwds={"title": "Density per km2", "fmt": "{:.0f}", "loc": "lower right"})
+ax.set_title("Home extension applications per km2, Dublin City EDs, 2019-2025")
+ax.set_axis_off() 
+
+## c. Saving the map image to the output folder with required name
+plt.savefig(OUTPUTS / "ExtensionDensity_DublinED.png", dpi=300, bbox_inches="tight")
+plt.show()
