@@ -122,7 +122,7 @@ raw_moran = Moran(
     permutations=PERMUTATIONS
 )
 
-## Compute Global Moran's I fir raw density variable.
+## Compute Global Moran's I for the raw density variable.
 sqrt_moran = Moran(
     sqrt_density.to_numpy(),
     weights,
