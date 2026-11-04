@@ -1,6 +1,6 @@
 
 """
-GEOG41160 Assignment 2, Question 2: Global spatial autocorrelation
+GEOG41160 Assignment 2, Question 2: Global Spatial Autocorrelation
 Team: 2
 ANSWERS
 
@@ -8,6 +8,7 @@ ANSWERS
    (skewness = 1.39). We selected a square-root transformation,
    which reduced skewness to 0.35 and gave a more balanced
    distribution than log1p (skewness = -1.14).
+   
 2. Spatial weights: We used row-standardised Queen contiguity.
    EDs sharing an edge or a vertex were treated as neighbours.
    All 162 EDs had neighbours. Each ED had 2–11 neighbours,
@@ -34,7 +35,8 @@ import pandas as pd
 from esda.moran import Moran
 from libpysal.weights import Queen
 
-
+## =========== SetupLoaded =========== ##
+## ============ GOOD LUCK ============ ##
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = ROOT / "outputs"
@@ -65,7 +67,7 @@ print(f"Square-root density skewness: {sqrt_density.skew():.2f}")
 print(f"Log-transformed density skewness: {log_density.skew():.2f}")
 
 
-fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+fig, axes = plt.subplots(1, 3, figsize=(15, 4)  # Compare the three distributions
 
 axes[0].hist(density, bins=20, edgecolor="black")
 axes[0].set_title("Raw extension density")
@@ -100,6 +102,7 @@ print("Number of islands:", len(weights.islands))
 print("Minimum neighbours:", min(neighbour_counts))
 print("Maximum neighbours:", max(neighbour_counts))
 print(f"Mean neighbours: {np.mean(neighbour_counts):.2f}")
+# Summarise the neighbour structure
 
 
 np.random.seed(SEED)
