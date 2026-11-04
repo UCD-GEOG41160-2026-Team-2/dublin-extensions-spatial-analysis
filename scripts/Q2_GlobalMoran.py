@@ -23,7 +23,7 @@ ANSWERS
    spatial autocorrelation, indicating that similar extension-
    density values tend to cluster in neighbouring EDs. The
    square-root transformation slightly increased Moran's I,
-   but did not change the overall conclusion。
+   but did not change the overall conclusion.
 """
 
 from pathlib import Path
@@ -39,35 +39,39 @@ from libpysal.weights import Queen
 ## ============ GOOD LUCK ============ ##
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUTS = ROOT / "outputs"
-DENSITY_FILE = OUTPUTS / "DublinED_ExtensionDensity.gpkg"
-FIGURE_FILE = OUTPUTS / "ExtensionDensity_Distribution.png"
+OUTPUTS = ROOT / "outputs"  ## Output files path.
+DENSITY_FILE = OUTPUTS / "DublinED_ExtensionDensity.gpkg"  ## Electoral division in Dublin and extension density.
+FIGURE_FILE = OUTPUTS / "ExtensionDensity_Distribution.png"  ## Distribution histogram plot(subplots).
 
-SEED = 42
-PERMUTATIONS = 9999
+SEED = 42  ## Random seed.
+PERMUTATIONS = 9999  ##Number of permutation tests.
 DENSITY_COLUMN = "app_density_km2"
 
-
+## Read ED zone vector dataset.
 eds = gpd.read_file(DENSITY_FILE)
 
+## Convert the density column to a numeric type. Values cannot be converted will be set as NaN.
 eds[DENSITY_COLUMN] = pd.to_numeric(
     eds[DENSITY_COLUMN],
     errors="coerce"
 )
 valid_rows = np.isfinite(eds[DENSITY_COLUMN])
-eds = eds.loc[valid_rows].copy()
+eds = eds.loc[valid_rows].copy()  ## Keep the limited and non-empty valid rows.
 
+## Extract raw density series.
 density = eds[DENSITY_COLUMN]
-sqrt_density = np.sqrt(density)
-log_density = np.log1p(density)
+sqrt_density = np.sqrt(density)  ## Square root transformation.
+log_density = np.log1p(density)  ## Log1p transformation.
 
+## Print valid sample count and skewness after transformation.
 print("EDs with valid density:", len(eds))
 print(f"Raw density skewness: {density.skew():.2f}")
 print(f"Square-root density skewness: {sqrt_density.skew():.2f}")
 print(f"Log-transformed density skewness: {log_density.skew():.2f}")
 
 
-fig, axes = plt.subplots(1, 3, figsize=(15, 4)  # Compare the three distributions
+## Create 1 row with 3 subplots, and side-by-side compare the three histograms.
+fig, axes = plt.subplots(1, 3, figsize=(15, 4)  ## Compare the three distributions.
 
 axes[0].hist(density, bins=20, edgecolor="black")
 axes[0].set_title("Raw extension density")
@@ -84,14 +88,19 @@ axes[2].set_title("Log-transformed density")
 axes[2].set_xlabel("log1p(applications per km²)")
 axes[2].set_ylabel("Number of EDs")
 
+## Auto-adjust subplots layout. 
 fig.tight_layout()
+
+## Export the image in following format.
 fig.savefig(FIGURE_FILE, dpi=300, bbox_inches="tight")
 plt.show()
 
 
+## Build Qween contiguity weights.
 weights = Queen.from_dataframe(eds, use_index=False)
 weights.transform = "R"
 
+## How to predicate neighbours.
 neighbour_counts = [
     len(neighbours)
     for neighbours in weights.neighbors.values()
@@ -102,7 +111,7 @@ print("Number of islands:", len(weights.islands))
 print("Minimum neighbours:", min(neighbour_counts))
 print("Maximum neighbours:", max(neighbour_counts))
 print(f"Mean neighbours: {np.mean(neighbour_counts):.2f}")
-# Summarise the neighbour structure
+## Summarise the statistics of spatial weight matrix.
 
 
 np.random.seed(SEED)
@@ -113,12 +122,14 @@ raw_moran = Moran(
     permutations=PERMUTATIONS
 )
 
+## Compute Global Moran's I fir raw density variable.
 sqrt_moran = Moran(
     sqrt_density.to_numpy(),
     weights,
     permutations=PERMUTATIONS
 )
 
+## Output Moran and permutation-based p-value.
 print(f"Raw density Moran's I: {raw_moran.I:.4f}")
 print(f"Raw density permutation p-value: {raw_moran.p_sim:.4f}")
 print(f"Square-root density Moran's I: {sqrt_moran.I:.4f}")
