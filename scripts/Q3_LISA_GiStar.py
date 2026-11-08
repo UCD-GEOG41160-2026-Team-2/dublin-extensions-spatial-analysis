@@ -13,7 +13,8 @@ A false discovery rate (FDR) correction was applied to the LISA p-values,
 resulting in an adjusted significance threshold of 0.007716 with 25 EDs remaining statistically significant.
 
 3.3 LISA Cluster Map
-
+A colour-coded map of the LISA cluster classifications was created,
+including a legend, and saved as LISA_ExtensionDensity_DublinED.png.
 
 
 3.4 Getis-Ord Gi*
@@ -59,7 +60,6 @@ weights.transform = "R"
 # LISA cluster classification
 
 lisa = Moran_Local(sqrt_density, weights, permutations=9999, seed=42)
-
 quadrants = {
     1: "High-High",
     2: "Low-High",
@@ -104,7 +104,6 @@ for label, colour in colours.items():
         linewidth=0.3,
         label=label
     )
-
 ax.set_title("LISA Clusters of Extension Density, Dublin EDs")
 ax.set_axis_off()
 ax.legend(title="LISA class", loc="lower right")
@@ -114,5 +113,4 @@ plt.savefig(
     dpi=300,
     bbox_inches="tight"
 )
-
 plt.show()
