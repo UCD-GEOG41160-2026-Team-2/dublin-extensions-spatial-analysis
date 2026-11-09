@@ -18,11 +18,22 @@ including a legend, and saved as LISA_ExtensionDensity_DublinED.png.
 
 
 3.4 Getis-Ord Gi*
-x
+The script calculates Gi* for each ED using binary Queen contiguity weights and includes the focal ED (star=1.0).
+It classifies hotspots where Z > 1.96 and coldspots where Z < -1.96,
+calculates two-sided p-values from the Gi* Z-scores, and applies FDR correction at alpha = 0.05.
+The script prints the hotspot/coldspot counts, FDR threshold, and the EDs that remain significant after correction.
+
 3.5 Gi* Cluster Map
-x
+Hotspot and coldspot map: The script maps the Gi* Z-scores using the diverging RdBu_r colour scheme.
+EDs that remain significant after FDR are outlined in black.
+The map is saved as: outputs/GiStar_ExtensionDensity_DublinED.png
+
 3.6 Comparison of LISA and Gi* Cluster Maps
-x
+Both methods identify high extension application density clusters in south-central Dublin.
+However, their results differ because LISA identifies local spatial clusters and outliers,
+while Gi* identifies concentrations of high or low values across neighbouring areas.
+Despite these differences, both methods indicate spatial clustering in extension application density.
+Their combined results provide a better understanding of its spatial distribution across Dublin.
 
 """
 
