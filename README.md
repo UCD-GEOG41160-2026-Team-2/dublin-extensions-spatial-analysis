@@ -46,7 +46,7 @@ The input GeoPackages must be saved in their specified locations before running 
 
 | Sprint | Date | Work completed | Next steps |
 |---|---|---|---|
-| Sprint 0 | [DATE] | Repository setup and initial README | Prepare and verify the input data |
-| Sprint 1 | [DATE] | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
-| Sprint 2 | [DATE] | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
-| Sprint 3 | [DATE] | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
+| Sprint 0 | 23/10/2026 | Repository setup and initial README | Prepare and verify the input data |
+| Sprint 1 | 29/10/2026 | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
+| Sprint 2 | 04/11/2026 | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
+| Sprint 3 | 09/11/2026 | Completed Question 3: LISA, Gi* and maps | Final review and quality checks |
