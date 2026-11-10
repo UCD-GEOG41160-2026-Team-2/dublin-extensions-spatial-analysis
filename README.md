@@ -47,6 +47,6 @@ The input GeoPackages must be saved in their specified locations before running 
 | Sprint | Date | Work completed | Next steps |
 |---|---|---|---|
 | Sprint 0 | 23/10/2026 | Repository setup and initial README | Prepare and verify the input data |
-| Sprint 1 | 29/10/2026 | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
-| Sprint 2 | 04/11/2026 | [RECORD ACTUAL PROGRESS] | [NEXT TASKS] |
+| Sprint 1 | 29/10/2026 | Completed Question 1: Extension Density Calculation, DuckDB filtering, spatial join, and saved density choropleth map | Begin Question 2 with density gpkg file produced from Q1|
+| Sprint 2 | 04/11/2026 | Completed Question 2: Checked data distribution and compared both transformations with the raw distribution by plotting them side by side, applied square-root transformation, built spatial weights and computed Global Moran's I | Begin Question 3 (Local spatial autocorrelation and hotspot analysis with/without FDR)
 | Sprint 3 | 09/11/2026 | Completed Question 3: LISA, Gi* and maps | Final review and quality checks |

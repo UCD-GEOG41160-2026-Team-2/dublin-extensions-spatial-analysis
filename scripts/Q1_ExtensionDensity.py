@@ -1,5 +1,5 @@
 """
-GEOG41160 Assignment 2, Question 1: Dublin Tree and Planning Density
+GEOG41160 Assignment 2, Question 1: Extension Density By ED
 Team: 2
 
 ANSWERS
@@ -28,9 +28,9 @@ ANSWERS
 
 4. Density calculation and Export:
     -Calculated local extension densities by dividing total applications by each ED's surface area (converted to sq.kms), and created table in DuckDB
-    -Pulled that table, converted into dataframe, and converted that df into GeoDataFrame and parsing its WKB geometry object to shapely 
+    -Pulled that table, converted into dataframe, and converted that df into GeoDataFrame and parsing its WKB geometry object to shapely
     -Exported resulting gdf to a GeoPackage named 'DublinED_ExtensionDensity.gpkg' in outputs folder.
-        -for smaller EDs covering less than 1 sq.km, the density value appears higher than the raw application count because 
+        -for smaller EDs covering less than 1 sq.km, the density value appears higher than the raw application count because
         dividing the count by a fractional area mathematically scales the number upward.
 
 
@@ -38,7 +38,7 @@ ANSWERS
     -The map shows clear pattern differences across Dublin : Home extension applications are much higher in certain areas than others.
     - The highest extension densities (dark blue) are packed into mature residential neighborhoods like Rathmines, Clontarf and parts of South East Dublin where homeowners apparently are actively extending their properties.
     -The lowest density zones (light blue and white) show up in the commercial city center and outer areas with less housing or more open/industrial land.
-    """
+"""
 
 from pathlib import Path
 
@@ -185,7 +185,11 @@ con.execute("""
 
 ## b. Pulling the table from DuckDB into a GeoPandas gdf
 density_df = con.execute("SELECT * FROM eds_density").df()
-ex_density_gdf = gpd.GeoDataFrame(density_df, geometry=gpd.GeoSeries.from_wkb(density_df['geometry'].apply(bytes)), crs="EPSG:2157")
+ex_density_gdf = gpd.GeoDataFrame(
+    density_df,
+    geometry=gpd.GeoSeries.from_wkb(density_df["geometry"].apply(bytes)),
+    crs="EPSG:2157",
+)
 # converted WKB bytearray geometry to Shapely geometries so GeoPandas can perform spatial functions
 
 ## c. Saving it as gpkg as required
@@ -193,7 +197,9 @@ ex_density_gdf.to_file(OUTPUTS / "DublinED_ExtensionDensity.gpkg", driver="GPKG"
 print("Successfully calculated density and saved DublinED_ExtensionDensity.gpkg")
 
 # brief check if density column is added
-print(ex_density_gdf[['ED_ENGLISH', 'extension_applications', 'app_density_km2']].head())
+print(
+    ex_density_gdf[["ED_ENGLISH", "extension_applications", "app_density_km2"]].head()
+)
 
 #########################################
 ##### 5. PLOTTING THE EXTENSION DENSITY MAP  #####
@@ -202,19 +208,20 @@ print(ex_density_gdf[['ED_ENGLISH', 'extension_applications', 'app_density_km2']
 ## a. Loading the saved GeoPackage back in
 ex_density_map = gpd.read_file(OUTPUTS / "DublinED_ExtensionDensity.gpkg")
 
-## b. Plotting the choropleth map using the app_density_km2 
+## b. Plotting the choropleth map using the app_density_km2
 ax = ex_density_map.plot(
-    column="app_density_km2", 
-    scheme="Quantiles", 
-    k=5, 
-    cmap="Blues", 
-    edgecolor="grey", 
-    linewidth=0.3, 
-    figsize=(7,6), 
-    legend=True, 
-    legend_kwds={"title": "Density per km2", "fmt": "{:.0f}", "loc": "lower right"})
+    column="app_density_km2",
+    scheme="Quantiles",
+    k=5,
+    cmap="Blues",
+    edgecolor="grey",
+    linewidth=0.3,
+    figsize=(7, 6),
+    legend=True,
+    legend_kwds={"title": "Density per km2", "fmt": "{:.0f}", "loc": "lower right"},
+)
 ax.set_title("Home extension applications per km2, Dublin City EDs, 2019-2025")
-ax.set_axis_off() 
+ax.set_axis_off()
 
 ## c. Saving the map image to the output folder with required name
 plt.savefig(OUTPUTS / "ExtensionDensity_DublinED.png", dpi=300, bbox_inches="tight")
